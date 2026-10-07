@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Minha casa em obra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E7EAEC; --paper:#F6F7F7; --ink:#16222A; --muted:#566670; --line:#C4CCD1;
+  --brand:#1B4F8F; --brand-ink:#FFFFFF; --gasto:#B3382C; --ganho:#1E7A4B; --gratis:#8A5F00;
+  --tape:#F2B705; --brick:#A9482F; --brick-off:#D3D8DB; --soft:#DCE3E8;
+  --display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --body:'Instrument Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10181D; --paper:#18232A; --ink:#E6ECEF; --muted:#9AAAB3; --line:#2C3A43;
+    --brand:#6BA6EE; --brand-ink:#0B1A2B; --gasto:#F08A7E; --ganho:#5FCB93; --gratis:#F2B705;
+    --brick:#C9593C; --brick-off:#2B3841; --soft:#1F2D36; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10181D; --paper:#18232A; --ink:#E6ECEF; --muted:#9AAAB3; --line:#2C3A43;
+  --brand:#6BA6EE; --brand-ink:#0B1A2B; --gasto:#F08A7E; --ganho:#5FCB93; --gratis:#F2B705;
+  --brick:#C9593C; --brick-off:#2B3841; --soft:#1F2D36; color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1}
+h2{font-size:1.25rem;font-weight:600;margin-bottom:.75rem}
+p{margin:0 0 .6rem}
+.wrap{max-width:62rem;margin:0 auto;padding:0 1rem}
+.top{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);border-bottom:1px solid var(--line);z-index:5}
+.top-in{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;padding-top:.9rem;padding-bottom:.4rem}
+.top h1{font-size:1.6rem;font-weight:800}
+.sub{color:var(--muted);font-size:.9rem;margin:.15rem 0 0}
+.save{font-size:.8rem;color:var(--muted);margin:0;text-align:right}
+.save.bad{color:var(--gasto)}
+.tabs{display:flex;gap:.25rem;overflow-x:auto;scrollbar-width:none}
+.tabs button{flex:0 0 auto;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);font:inherit;font-weight:500;padding:.55rem .8rem;cursor:pointer}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--tape);font-weight:600}
+main{padding-top:1.25rem;padding-bottom:3rem}
+.panel[hidden]{display:none}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:1.1rem 1.2rem;margin-bottom:1rem}
+.grid2{display:grid;grid-template-columns:1.2fr 1fr;gap:1rem;align-items:start}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.hero h2{font-size:clamp(1.7rem,5vw,2.8rem);font-weight:800;margin-bottom:.4rem}
+.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(1.55rem,1fr));gap:3px;margin:1rem 0 .3rem}
+.brick{height:.8rem;background:var(--brick-off);border-radius:1px}
+.brick.on{background:var(--brick)}
+.brick.next{background:var(--tape)}
+.muted{color:var(--muted)}
+.small{font-size:.88rem}
+table{width:100%;border-collapse:collapse}
+.scroll{overflow-x:auto}
+.ledger td,.ledger th{padding:.42rem 0;border-bottom:1px solid var(--line);text-align:left;font-weight:400}
+.ledger td:last-child{text-align:right;white-space:nowrap}
+.ledger .grp th{padding-top:1rem;font-weight:600;color:var(--muted);font-size:.9rem}
+.ledger .tot td,.ledger .tot th{font-weight:600;border-bottom:2px solid var(--ink)}
+.socios{min-width:34rem}
+.socios th,.socios td{padding:.45rem .5rem;border-bottom:1px solid var(--line);text-align:right;font-weight:400;white-space:nowrap}
+.socios th:first-child,.socios td:first-child{text-align:left;white-space:normal}
+.socios thead th{font-weight:600;font-size:.92rem}
+.socios .grp th{text-align:left;padding-top:1rem;color:var(--muted);font-weight:600;font-size:.9rem}
+.socios .tot td,.socios .tot th{font-weight:600;border-bottom:2px solid var(--ink)}
+.socios td:last-child,.socios th:last-child{background:var(--soft)}
+.neg{color:var(--gasto)} .pos{color:var(--ganho)} .free{color:var(--gratis)}
+.note{background:var(--soft);border-left:4px solid var(--tape);padding:.7rem .9rem;border-radius:0 6px 6px 0;font-size:.93rem;margin-bottom:1rem}
+.f{display:flex;flex-direction:column;gap:.25rem;font-size:.88rem;color:var(--muted)}
+.f input,.f select,.f textarea,.filters input,.filters select,.cell input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:.55rem .65rem;width:100%}
+.f small{font-size:.78rem}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.8rem}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--brand);outline-offset:1px}
+.btn{font:inherit;font-weight:600;border-radius:6px;padding:.6rem 1rem;border:1px solid var(--brand);background:var(--brand);color:var(--brand-ink);cursor:pointer}
+.btn.ghost{background:none;color:var(--brand)}
+.btn.danger{border-color:var(--gasto);color:var(--gasto);background:none}
+.btn.sm{padding:.3rem .6rem;font-size:.85rem;font-weight:500}
+.row-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem}
+.seg{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.9rem}
+.seg button{font:inherit;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:.45rem .9rem;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(10rem,1fr));gap:.6rem;margin-bottom:.5rem}
+.item{display:grid;grid-template-columns:5.6rem 1fr auto auto;gap:.2rem .8rem;align-items:center;padding:.7rem 0;border-bottom:1px solid var(--line)}
+.item .d{color:var(--muted);font-size:.88rem}
+.item .v{font-weight:600;text-align:right;white-space:nowrap}
+.item .t{font-weight:500}
+.tag{display:inline-block;font-size:.75rem;background:var(--soft);border-radius:4px;padding:0 .4rem;margin-left:.35rem;color:var(--muted)}
+.tag.prev{background:var(--tape);color:#2A2000}
+@media (max-width:640px){.item{grid-template-columns:1fr auto}.item .d{grid-column:1/-1}.item .acts{grid-column:1/-1}}
+.bar{height:.45rem;background:var(--line);border-radius:3px;overflow:hidden;margin:.2rem 0 .7rem}
+.bar i{display:block;height:100%;background:var(--brand)}
+.catrow{display:flex;justify-content:space-between;gap:1rem;font-size:.92rem}
+.res{border-left:5px solid var(--line);padding:.5rem 0 .5rem .9rem;margin-bottom:.8rem}
+.res.win{border-left-color:var(--tape)}
+.res h3{font-size:1rem;font-weight:600}
+.res .big{font-family:var(--display);font-weight:800;font-size:1.7rem}
+.legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:.85rem;margin:.4rem 0}
+.legend i{display:inline-block;width:1.1rem;height:0;border-top:3px solid;vertical-align:middle;margin-right:.35rem}
+.chartbox{overflow-x:auto}
+.chartbox svg{min-width:560px;width:100%;height:auto;display:block}
+.chips{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.3rem}
+.chips button{font:inherit;font-size:.82rem;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:.2rem .7rem;cursor:pointer}
+input[type=range]{padding:0;accent-color:var(--brand)}
+details summary{cursor:pointer;font-weight:600;margin:.4rem 0}
+.sens td,.sens th{padding:.35rem .4rem;border-bottom:1px solid var(--line);text-align:right;font-weight:400}
+.sens th:first-child,.sens td:first-child{text-align:left}
+textarea.bk{width:100%;min-height:12rem;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.78rem;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:.6rem}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(1rem + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:.6rem .9rem;border-radius:8px;display:flex;gap:.9rem;align-items:center;z-index:20;max-width:92vw}
+.toast[hidden]{display:none}
+.toast button{background:none;border:0;color:var(--tape);font:inherit;font-weight:600;cursor:pointer}
+.err{color:var(--gasto);font-size:.88rem;margin:.5rem 0 0}
+@media (prefers-reduced-motion:no-preference){.brick{transition:background .3s}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-in">
+    <div>
+      <h1 id="h-nome">Minha casa</h1>
+      <p class="sub" id="h-sub"></p>
+    </div>
+    <p class="save" id="save-state" role="status"></p>
+  </div>
+  <nav class="wrap tabs" role="tablist" id="tabs" aria-label="Seções"></nav>
+</header>
+
+<main class="wrap">
+
+<!-- PAINEL -->
+<section class="panel" id="tab-painel" role="tabpanel">
+  <div id="p-aviso"></div>
+  <div class="card hero" id="p-wall"></div>
+  <div class="card" id="p-socios"></div>
+  <div class="grid2">
+    <div class="card" id="p-contas"></div>
+    <div id="p-side"></div>
+  </div>
+</section>
+
+<!-- LANÇAMENTOS -->
+<section class="panel" id="tab-lanc" role="tabpanel" hidden>
+  <div class="card">
+    <h2 id="l-titulo">Novo lançamento</h2>
+    <div class="seg" id="l-tipo" role="group" aria-label="Tipo de lançamento">
+      <button type="button" data-tipo="gasto" aria-pressed="true">Gastei</button>
+      <button type="button" data-tipo="ganho" aria-pressed="false">Recebi</button>
+      <button type="button" data-tipo="gratis" aria-pressed="false">Feito ou ganho de graça</button>
+    </div>
+    <p class="muted small" id="l-dica"></p>
+    <div class="fgrid">
+      <label class="f">Data<input type="date" id="l-data"></label>
+      <label class="f">Descrição<input type="text" id="l-desc" placeholder="Ex.: Contrato de compra e venda"></label>
+      <label class="f"><span id="l-valor-lbl">Valor (R$)</span><input type="number" id="l-valor" min="0" step="0.01" inputmode="decimal"></label>
+      <label class="f"><span id="l-quem-lbl">Quem pagou</span><select id="l-quem"></select></label>
+      <label class="f">Categoria<select id="l-cat"></select></label>
+      <label class="f">Fase<select id="l-fase"></select></label>
+      <label class="f">Observação (opcional)<input type="text" id="l-obs"></label>
+    </div>
+    <p class="err" id="l-erro" hidden></p>
+    <div class="row-actions">
+      <button class="btn" type="button" id="l-salvar">Salvar lançamento</button>
+      <button class="btn ghost" type="button" id="l-cancelar" hidden>Cancelar edição</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Todos os lançamentos</h2>
+    <div class="filters">
+      <input type="search" id="f-busca" placeholder="Buscar na descrição" aria-label="Buscar na descrição">
+      <select id="f-tipo" aria-label="Filtrar por tipo"><option value="">Todos os tipos</option><option value="gasto">Gastos</option><option value="ganho">Ganhos</option><option value="gratis">De graça</option></select>
+      <select id="f-fase" aria-label="Filtrar por fase"></select>
+      <select id="f-quem" aria-label="Filtrar por pessoa"></select>
+    </div>
+    <div id="l-lista"></div>
+    <div id="l-totais" class="small muted" style="margin-top:.8rem"></div>
+  </div>
+</section>
+
+<!-- FINANCIAMENTO -->
+<section class="panel" id="tab-fin" role="tabpanel" hidden>
+  <div class="card">
+    <h2>A compra</h2>
+    <div class="fgrid">
+      <label class="f">Apelido da casa<input type="text" data-path="nome"></label>
+      <label class="f">Preço da casa (R$)<input type="number" step="0.01" data-path="compra.preco" data-type="num"></label>
+      <label class="f">Entrada (R$)<input type="number" step="0.01" data-path="compra.entrada" data-type="num"></label>
+      <label class="f">Número de parcelas<input type="number" min="1" step="1" data-path="compra.parcelas" data-type="int"></label>
+      <label class="f">Valor da parcela (R$)<input type="number" step="0.01" data-path="compra.valorParcela" data-type="num"></label>
+      <label class="f">Data da compra e entrada<input type="date" data-path="compra.dataCompra" data-type="date"></label>
+      <label class="f">Data da primeira parcela<input type="date" data-path="compra.primeiraParcela" data-type="date"></label>
+    </div>
+    <div id="fin-out" style="margin-top:1rem"></div>
+  </div>
+  <div class="card">
+    <h2>Sócios e quem paga o quê</h2>
+    <p class="muted small">Dê nome a cada pessoa e diga quanto cada uma paga da entrada e das parcelas. As porcentagens de cada coluna devem somar 100. A participação define como o aluguel, as despesas fixas e os gastos marcados como "Dividir pela participação" são repartidos. Terceiros (mãe, doações) normalmente ficam com 0% de participação.</p>
+    <div class="scroll"><table class="socios">
+      <thead><tr><th>Nome</th><th>Participação na casa (%)</th><th>Paga a entrada (%)</th><th>Paga as parcelas (%)</th></tr></thead>
+      <tbody>
+        <tr><td class="cell"><input type="text" data-path="socios.nomeEu" aria-label="Nome da primeira pessoa"></td>
+            <td class="cell"><input type="number" step="0.1" data-path="socios.partEu" data-type="num" aria-label="Participação, primeira pessoa"></td>
+            <td class="cell"><input type="number" step="0.1" data-path="socios.entEu" data-type="num" aria-label="Entrada, primeira pessoa"></td>
+            <td class="cell"><input type="number" step="0.1" data-path="socios.parcEu" data-type="num" aria-label="Parcelas, primeira pessoa"></td></tr>
+        <tr><td class="cell"><input type="text" data-path="socios.nomeIrma" aria-label="Nome da segunda pessoa"></td>
+            <td class="cell"><input type="number" step="0.1" data-path="socios.partIrma" data-type="num" aria-label="Participação, segunda pessoa"></td>
+            <td class="cell"><input type="number" step="0.1" data-path="socios.entIrma" data-type="num" aria-label="Entrada, segunda pessoa"></td>
+            <td class="cell"><input type="number" step="0.1" data-path="socios.parcIrma" data-type="num" aria-label="Parcelas, segunda pessoa"></td></tr>
+        <tr><td class="cell"><input type="text" data-path="socios.nomeTerc" aria-label="Nome de terceiros"></td>
+            <td class="cell"><input type="number" step="0.1" data-path="socios.partTerc" data-type="num" aria-label="Participação, terceiros"></td>
+            <td class="cell"><input type="number" step="0.1" data-path="socios.entTerc" data-type="num" aria-label="Entrada, terceiros"></td>
+            <td class="cell"><input type="number" step="0.1" data-path="socios.parcTerc" data-type="num" aria-label="Parcelas, terceiros"></td></tr>
+      </tbody>
+    </table></div>
+    <div id="soc-out" class="small" style="margin-top:.6rem"></div>
+  </div>
+  <div class="card">
+    <h2>Aluguel e despesas fixas</h2>
+    <div class="fgrid">
+      <label class="f">Aluguel mensal (R$)<input type="number" step="0.01" data-path="aluguel.valor" data-type="num"></label>
+      <label class="f">Recebendo desde<input type="date" data-path="aluguel.inicio" data-type="date"></label>
+      <label class="f">Reajuste anual (%)<input type="number" step="0.1" data-path="aluguel.reajuste" data-type="num"></label>
+      <label class="f">Despesas fixas por mês (R$)<input type="number" step="0.01" data-path="aluguel.despesaFixa" data-type="num"><small>IPTU, condomínio, seguro. Contam a partir do mês seguinte à compra.</small></label>
+    </div>
+    <p class="muted small" style="margin-top:.8rem">O aluguel só conta a partir da data da compra, mesmo que a casa já estivesse alugada antes. Ganhos e gastos avulsos entram em Lançamentos.</p>
+    <div id="alug-out"></div>
+  </div>
+  <div class="card">
+    <details><summary>Tabela de parcelas</summary><div id="parc-tab"></div></details>
+  </div>
+</section>
+
+<!-- COMPARATIVO -->
+<section class="panel" id="tab-comp" role="tabpanel" hidden>
+  <div class="card">
+    <h2>E se o dinheiro tivesse ido para investimento?</h2>
+    <p class="muted small">A comparação usa o dinheiro que saiu do bolso (entrada, parcelas, obra e despesas), no mesmo mês em que saiu. Na casa, o retorno é o imóvel mais o aluguel. Nos investimentos, o retorno são os dividendos (ou juros) pagos todo mês, que podem ser reinvestidos e passam a render também. Mexa nas taxas e veja o resultado mudar.</p>
+    <div class="fgrid" style="margin-top:.8rem">
+      <label class="f">Comparar para<select data-path="prem.quem" id="sel-quem"></select><small>Escolha uma pessoa ou todos juntos.</small></label>
+      <label class="f">Valor de mercado da casa hoje (R$)<input type="number" step="1000" data-path="prem.valorHoje" data-type="num"><small>Se a reforma valorizou a casa, coloque o valor novo aqui.</small></label>
+      <div class="f">Valorização da casa (% ao ano)
+        <input type="range" min="-5" max="20" step="0.1" data-path="prem.valorizacao" data-type="num" aria-label="Valorização, slider">
+        <input type="number" step="0.1" data-path="prem.valorizacao" data-type="num" aria-label="Valorização, valor">
+      </div>
+    </div>
+    <div class="fgrid" style="margin-top:1rem">
+      <div class="f">Renda fixa: juros (% ao ano)
+        <input type="range" min="0" max="25" step="0.1" data-path="prem.rf" data-type="num" aria-label="Renda fixa, slider">
+        <input type="number" step="0.1" data-path="prem.rf" data-type="num" aria-label="Renda fixa, valor">
+      </div>
+      <div class="f">Bolsa: dividendos, o DY (% ao ano)
+        <input type="range" min="0" max="25" step="0.1" data-path="prem.dy" data-type="num" aria-label="DY, slider">
+        <input type="number" step="0.1" data-path="prem.dy" data-type="num" aria-label="DY, valor">
+        <div class="chips" id="chips-dy">
+          <button type="button" data-b="6">DY 6%</button><button type="button" data-b="9">DY 9%</button><button type="button" data-b="12">DY 12%</button><button type="button" data-b="15">DY 15%</button>
+        </div>
+      </div>
+      <div class="f">Bolsa: valorização das cotas (% ao ano)
+        <input type="range" min="-15" max="25" step="0.1" data-path="prem.cotas" data-type="num" aria-label="Cotas, slider">
+        <input type="number" step="0.1" data-path="prem.cotas" data-type="num" aria-label="Cotas, valor">
+        <small>Zero deixa só os dividendos. Valores negativos simulam queda das cotas.</small>
+      </div>
+    </div>
+    <div class="f" style="margin-top:1rem">
+      <span id="h-label">Ver o resultado em</span>
+      <input type="range" min="0" max="400" step="1" data-path="prem.horizonte" data-type="int" id="h-slider" aria-label="Mês do resultado">
+      <div class="chips">
+        <button type="button" data-act="h-hoje">Hoje</button>
+        <button type="button" data-act="h-fim">Fim do financiamento</button>
+        <button type="button" data-act="h-mais5">5 anos depois</button>
+      </div>
+    </div>
+    <details style="margin-top:1rem"><summary>Ajustes avançados</summary>
+      <div class="fgrid" style="margin-top:.6rem">
+        <label class="f">Dividendos e juros recebidos<select data-path="prem.reinvDiv"><option value="sim">Reinvisto todo mês (rendem juros sobre juros)</option><option value="nao">Ficam parados no caixa</option></select></label>
+        <label class="f">O aluguel recebido é reaplicado em
+          <select data-path="prem.reinvest"><option value="rf">Renda fixa</option><option value="bolsa">Bolsa</option><option value="nada">Não reaplico (0%)</option></select></label>
+        <label class="f">IR sobre o lucro da renda fixa (%)<input type="number" step="0.5" data-path="prem.irRf" data-type="num"></label>
+        <label class="f">IR sobre o lucro da bolsa (%)<input type="number" step="0.5" data-path="prem.irBolsa" data-type="num"></label>
+        <label class="f">IR sobre o lucro da venda da casa (%)<input type="number" step="0.5" data-path="prem.irImovel" data-type="num"><small>Pode haver isenção. Confira com um contador.</small></label>
+        <label class="f">Custo de venda da casa (%)<input type="number" step="0.5" data-path="prem.custoVenda" data-type="num"><small>Corretagem e taxas, se for vender.</small></label>
+      </div>
+    </details>
+  </div>
+  <div class="card" id="c-res"></div>
+  <div class="card" id="c-chart"></div>
+  <div class="card" id="c-renda"></div>
+  <div class="card" id="c-sens"></div>
+  <div class="card"><details><summary>Primeiros 12 meses, mês a mês</summary><div id="c-tab" class="scroll"></div></details></div>
+  <p class="muted small">Simulação feita só com os números que você informou. As taxas iniciais são valores de partida: troque pelas taxas atuais. O rendimento mensal é a taxa anual dividida por 12. Não considera inflação nem IR sobre o aluguel, e a bolsa varia muito de um ano para o outro. Isto não é recomendação de investimento.</p>
+</section>
+
+<!-- BACKUP -->
+<section class="panel" id="tab-bk" role="tabpanel" hidden>
+  <div class="card">
+    <h2>Backup dos dados</h2>
+    <p>Seus dados ficam salvos só neste navegador, neste aparelho. Para guardar uma cópia ou levar para outro aparelho, copie o texto abaixo e cole em um bloco de notas ou mande para você mesmo.</p>
+    <textarea class="bk" id="bk-text" readonly aria-label="Dados em texto"></textarea>
+    <div class="row-actions">
+      <button class="btn" type="button" id="bk-copiar">Copiar texto</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Restaurar de uma cópia</h2>
+    <p>Cole aqui o texto que você copiou antes. Isso substitui os dados atuais.</p>
+    <textarea class="bk" id="bk-in" aria-label="Colar dados" placeholder="Cole o texto do backup aqui"></textarea>
+    <p class="err" id="bk-erro" hidden></p>
+    <div class="row-actions">
+      <button class="btn" type="button" id="bk-restaurar">Restaurar dados</button>
+      <button class="btn danger" type="button" id="bk-apagar">Apagar tudo</button>
+    </div>
+  </div>
+</section>
+
+</main>
+<div class="toast" id="toast" hidden role="status"><span id="toast-msg"></span><button type="button" id="toast-act" hidden></button></div>
+
+<script>
+(function(){
+'use strict';
+var KEY='minha-casa-obra-v1';
+var WHO=['eu','irma','terc'];
+
+/* ---------- datas ---------- */
+function pad(n){return String(n).padStart(2,'0');}
+var hoje=new Date();
+var todayStr=hoje.getFullYear()+'-'+pad(hoje.getMonth()+1)+'-'+pad(hoje.getDate());
+function addM(s,n){var p=s.split('-').map(Number);var t=p[0]*12+(p[1]-1)+n;return Math.floor(t/12)+'-'+pad(t%12+1)+'-'+pad(Math.min(p[2]||1,28));}
+var MES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+function fData(s){if(!s)return '';var p=s.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function fMes(s){var p=s.split('-');return MES[+p[1]-1]+'/'+p[0];}
+
+/* ---------- estado ---------- */
+function DEF(){return{
+  nome:'Minha casa',
+  compra:{preco:150000,entrada:12000,parcelas:92,valorParcela:1500,dataCompra:todayStr,primeiraParcela:addM(todayStr,1)},
+  aluguel:{valor:0,inicio:todayStr,reajuste:5,despesaFixa:0},
+  socios:{nomeEu:'Eu',nomeIrma:'Irmã',nomeTerc:'Terceiros',partEu:50,partIrma:50,partTerc:0,entEu:50,entIrma:50,entTerc:0,parcEu:50,parcIrma:50,parcTerc:0},
+  prem:{rf:13,dy:12,cotas:0,valorizacao:5,valorHoje:150000,reinvest:'rf',reinvDiv:'sim',irRf:15,irBolsa:15,irImovel:0,custoVenda:0,horizonte:null,quem:'tot'},
+  lanc:[]
+};}
+function merge(o){var d=DEF();o=o||{};
+  return{nome:o.nome||d.nome,compra:Object.assign({},d.compra,o.compra),aluguel:Object.assign({},d.aluguel,o.aluguel),
+    socios:Object.assign({},d.socios,o.socios),prem:Object.assign({},d.prem,o.prem),lanc:Array.isArray(o.lanc)?o.lanc:[]};}
+var S;
+try{var raw=localStorage.getItem(KEY);S=raw?merge(JSON.parse(raw)):DEF();}catch(e){S=DEF();}
+var saveOk=true;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));saveOk=true;}catch(e){saveOk=false;}
+  var el=document.getElementById('save-state');
+  el.textContent=saveOk?'Salvo neste navegador':'Não foi possível salvar. Use o Backup.';
+  el.className='save'+(saveOk?'':' bad');}
+
+/* ---------- formatação ---------- */
+var nf=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+var nf0=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
+function money(n){return nf.format(n||0);}
+function money0(n){return nf0.format(n||0);}
+function pct(n,d){return (n).toFixed(d==null?1:d).replace('.',',')+'%';}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function short(n){var a=Math.abs(n),s=n<0?'-':'';if(a>=1e6)return s+(a/1e6).toFixed(1).replace('.',',')+' mi';if(a>=1e3)return s+Math.round(a/1e3)+' mil';return s+Math.round(a);}
+
+/* ---------- sócios ---------- */
+function nome(k){var s=S.socios;return k==='eu'?s.nomeEu:k==='irma'?s.nomeIrma:k==='terc'?s.nomeTerc:k==='todos'?'Dividir pela participação':'Todos juntos';}
+function shares(prefix){
+  var s=S.socios,a=[+s[prefix+'Eu']||0,+s[prefix+'Irma']||0,+s[prefix+'Terc']||0],t=a[0]+a[1]+a[2];
+  if(t<=0)return prefix==='part'?{eu:1,irma:0,terc:0}:shares('part');
+  return{eu:a[0]/t,irma:a[1]/t,terc:a[2]/t};
+}
+function splitBy(v,quem,sh){
+  var o={eu:0,irma:0,terc:0};
+  if(WHO.indexOf(quem)>=0){o[quem]=v;return o;}
+  sh=sh||shares('part');WHO.forEach(function(k){o[k]=v*sh[k];});return o;
+}
+
+/* ---------- cálculo ---------- */
+function idx(s){var a=S.compra.dataCompra.split('-').map(Number),b=s.split('-').map(Number);return (b[0]-a[0])*12+(b[1]-a[1]);}
+function todayIdx(){return idx(todayStr);}
+function endIdx(){return Math.max(idx(S.compra.primeiraParcela)+Math.max(S.compra.parcelas,1)-1,0);}
+function getH(){var h=S.prem.horizonte;if(h==null)h=endIdx();return Math.max(0,Math.min(h,endIdx()+240));}
+function emptyT(){return{entrada:0,parcelas:0,gCompra:0,gReforma:0,gPos:0,fixas:0,aluguel:0,ganhos:0,economia:0};}
+
+function calc(H){
+  var c=S.compra,a=S.aluguel;
+  var t={eu:emptyT(),irma:emptyT(),terc:emptyT(),tot:emptyT()};
+  var n=H<0?0:Math.floor(H)+1;
+  function arrs(){return{eu:new Array(n).fill(0),irma:new Array(n).fill(0),terc:new Array(n).fill(0),tot:new Array(n).fill(0)};}
+  var out=arrs(),inn=arrs(),gas=arrs(),rent=arrs();
+  var R={out:out,inn:inn,gas:gas,rent:rent,t:t,H:H,nParcelas:0};
+  if(H<0)return R;
+  H=Math.floor(H);R.H=H;
+  function addTo(arr,m,sp){WHO.forEach(function(k){arr[k][m]+=sp[k];arr.tot[m]+=sp[k];});}
+  function addT(f,sp){WHO.forEach(function(k){t[k][f]+=sp[k];t.tot[f]+=sp[k];});}
+  var sp=splitBy(c.entrada,null,shares('ent'));addTo(out,0,sp);addT('entrada',sp);
+  var i0=idx(c.primeiraParcela),k,i,m,v,spP=splitBy(c.valorParcela,null,shares('parc'));
+  for(k=0;k<c.parcelas;k++){i=i0+k;if(i<=H){addTo(out,Math.max(i,0),spP);addT('parcelas',spP);R.nParcelas++;}}
+  if(a.despesaFixa>0){sp=splitBy(a.despesaFixa);for(m=1;m<=H;m++){addTo(out,m,sp);addT('fixas',sp);}}
+  if(a.valor>0){var s=idx(a.inicio);for(m=Math.max(s,0);m<=H;m++){v=a.valor*Math.pow(1+a.reajuste/100,Math.floor((m-s)/12));sp=splitBy(v);addTo(inn,m,sp);addTo(rent,m,sp);addT('aluguel',sp);}}
+  S.lanc.forEach(function(l){
+    var ii=idx(l.data);if(ii>H)return;var mm=Math.max(ii,0),val=+l.valor||0,s2=splitBy(val,l.quem||'todos');
+    if(l.tipo==='gasto'){addTo(out,mm,s2);addTo(gas,mm,s2);addT(l.fase==='compra'?'gCompra':l.fase==='pos'?'gPos':'gReforma',s2);}
+    else if(l.tipo==='ganho'){addTo(inn,mm,s2);addT('ganhos',s2);}
+    else if(l.tipo==='gratis'){addT('economia',s2);}
+  });
+  return R;
+}
+function sum(a){return a.reduce(function(x,y){return x+y;},0);}
+function mo(a){return Math.pow(1+a/100,1/12)-1;}
+function valorImovel(m){var P=S.prem;return P.valorHoje*Math.pow(1+P.valorizacao/100,(m-todayIdx())/12);}
+
+/* Investimento: todo mês o rendimento (taxa/12) incide sobre o saldo do mês anterior.
+   Se reinvestido, o dividendo entra no saldo e passa a render também. */
+function series(H,who){
+  who=who||'tot';
+  var P=S.prem,c=S.compra,R=calc(H),out=R.out[who],inn=R.inn[who],gas=R.gas[who],rent=R.rent[who];
+  var sh=who==='tot'?1:shares('part')[who];
+  var rfm=P.rf/100/12,dym=P.dy/100/12,gm=mo(P.cotas),reinv=P.reinvDiv!=='nao';
+  var rr=P.reinvest==='rf'?rfm:P.reinvest==='bolsa'?(dym+gm):0;
+  var irR=P.reinvest==='rf'?P.irRf:P.reinvest==='bolsa'?P.irBolsa:0;
+  var bRf=0,cRf=0,bB=0,cB=0,bR=0,contrib=0,cumIn=0,cumGas=0;
+  var o={casa:[],rf:[],bolsa:[],contrib:[],imovel:[],alug:[],divRf:[],divB:[],rent:rent,bBal:[],R:R};
+  for(var m=0;m<=H;m++){
+    var dR=0,dB=0;
+    if(m>0){
+      dR=bRf*rfm;dB=bB*dym;var app=bB*gm;
+      if(reinv){bRf+=dR;bB+=dB;}else{cRf+=dR;cB+=dB;}
+      bB+=app;bR*=1+rr;
+    }
+    bRf+=out[m];bB+=out[m];bR+=inn[m];contrib+=out[m];cumIn+=inn[m];cumGas+=gas[m];
+    var V=valorImovel(m)*sh,liq=V*(1-P.custoVenda/100);
+    var imv=liq-P.irImovel/100*Math.max(0,liq-(c.preco*sh+cumGas));
+    var al=bR-irR/100*Math.max(0,bR-cumIn);
+    var wRf=bRf+cRf,wB=bB+cB;
+    o.imovel.push(imv);o.alug.push(al);o.casa.push(imv+al);
+    o.rf.push(wRf-P.irRf/100*Math.max(0,wRf-contrib));
+    o.bolsa.push(wB-P.irBolsa/100*Math.max(0,wB-contrib));
+    o.contrib.push(contrib);o.divRf.push(dR);o.divB.push(dB);o.bBal.push(wB);
+  }
+  return o;
+}
+function invFinal(out,annual,ir){var r=annual/100/12,b=0,c=0;for(var m=0;m<out.length;m++){if(m>0)b*=1+r;b+=out[m];c+=out[m];}return b-ir/100*Math.max(0,b-c);}
+function breakEven(out,ir,target){
+  var lo=-90,hi=300;
+  if(invFinal(out,hi,ir)<target)return{dir:'acima'};
+  if(invFinal(out,lo,ir)>target)return{dir:'abaixo'};
+  for(var i=0;i<60;i++){var mid=(lo+hi)/2;if(invFinal(out,mid,ir)<target)lo=mid;else hi=mid;}
+  return{rate:(lo+hi)/2};
+}
+function taxaImplicita(pv,pmt,n){
+  if(n<=0||pv<=0||pmt*n<=pv+0.005)return 0;
+  var lo=1e-9,hi=0.3;
+  for(var i=0;i<80;i++){var r=(lo+hi)/2;var f=pmt*(1-Math.pow(1+r,-n))/r;if(f>pv)lo=r;else hi=r;}
+  return (lo+hi)/2;
+}
+
+/* ---------- constantes ---------- */
+var CATS=['Contrato e documentação','Impostos e taxas (ITBI, registro)','Projeto e arquitetura','Material de obra','Mão de obra','Elétrica e hidráulica','Acabamento e pintura','Móveis e eletrodomésticos','Limpeza e entulho','Aluguel e outras receitas','Outros'];
+var FASES={compra:'Compra',reforma:'Reforma',pos:'Depois da obra'};
+var TIPOS={gasto:'Gasto',ganho:'Ganho',gratis:'De graça'};
+var DICAS={
+  gasto:'Dinheiro que saiu do bolso de alguém: material, cartório, mão de obra, móveis. Escolha quem pagou. Se foi a sua mãe ou uma doação, marque Terceiros.',
+  ganho:'Dinheiro que entrou além do aluguel mensal (que já é calculado sozinho), como venda de sobras de material.',
+  gratis:'Algo que alguém fez sozinho ou ganhou. Informe quanto custaria se tivesse pago: isso mostra a economia e não entra nas contas do bolso.'
+};
+var QUEM_LBL={gasto:'Quem pagou',ganho:'Quem recebeu',gratis:'Quem fez ou ganhou'};
+
+/* ---------- toast ---------- */
+var toastT;
+function toast(msg,label,fn){
+  var t=document.getElementById('toast'),b=document.getElementById('toast-act');
+  document.getElementById('toast-msg').textContent=msg;
+  if(label){b.hidden=false;b.textContent=label;b.onclick=function(){t.hidden=true;fn();};}else{b.hidden=true;}
+  t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true;},label?6000:3000);
+}
+
+/* ---------- abas ---------- */
+var TABS=[['painel','Painel'],['lanc','Lançamentos'],['fin','Financiamento'],['comp','Comparativo'],['bk','Backup']];
+var tabAtual='painel';
+function buildTabs(){
+  document.getElementById('tabs').innerHTML=TABS.map(function(t){return '<button role="tab" type="button" data-tab="'+t[0]+'" aria-selected="'+(t[0]===tabAtual)+'">'+t[1]+'</button>';}).join('');
+}
+function showTab(id){
+  tabAtual=id;
+  TABS.forEach(function(t){document.getElementById('tab-'+t[0]).hidden=(t[0]!==id);});
+  document.querySelectorAll('#tabs button').forEach(function(b){b.setAttribute('aria-selected',b.dataset.tab===id);});
+  if(id==='bk')document.getElementById('bk-text').value=JSON.stringify(S,null,1);
+  window.scrollTo(0,0);
+  refresh();
+}
+
+/* ---------- nomes nos seletores ---------- */
+var nomesKey='';
+function updateNomes(){
+  var s=S.socios,key=[s.nomeEu,s.nomeIrma,s.nomeTerc].join('|');
+  if(key===nomesKey)return;nomesKey=key;
+  function opts(arr){return arr.map(function(a){return '<option value="'+a[0]+'">'+esc(a[1])+'</option>';}).join('');}
+  var base=[['eu',s.nomeEu],['irma',s.nomeIrma],['terc',s.nomeTerc]];
+  var q=document.getElementById('l-quem'),cur=q.value||'eu';
+  q.innerHTML=opts(base.concat([['todos','Dividir pela participação']]));q.value=cur;
+  var f=document.getElementById('f-quem'),cf=f.value;
+  f.innerHTML='<option value="">Todas as pessoas</option>'+opts(base.concat([['todos','Dividido pela participação']]));f.value=cf;
+  var sq=document.getElementById('sel-quem');
+  sq.innerHTML=opts([['tot','Todos juntos']].concat(base));sq.value=S.prem.quem||'tot';
+}
+
+/* ---------- PAINEL ---------- */
+function row(l,v,cls){return '<tr><td>'+l+'</td><td class="'+(cls||'')+'">'+v+'</td></tr>';}
+function renderPainel(){
+  var T=todayIdx(),R=calc(T),tt=R.t.tot,c=S.compra,a=S.aluguel;
+  var P=Math.max(c.parcelas,0),paid=Math.min(R.nParcelas,P);
+  var totGasto=tt.entrada+tt.parcelas+tt.gCompra+tt.gReforma+tt.gPos+tt.fixas;
+  var totRec=tt.aluguel+tt.ganhos,saldo=totRec-totGasto;
+  var avisos='';
+  if(!(a.valor>0))avisos+='<div class="note">Informe o aluguel mensal na aba Financiamento para ver quanto ele ajuda a pagar a casa e a obra.</div>';
+  if(T<0)avisos+='<div class="note">A data da compra ainda não chegou. Os totais abaixo começam a contar nesse dia.</div>';
+  var ss=shares('ent'),sp=shares('parc'),sa=S.socios;
+  if(Math.abs((+sa.entEu+ +sa.entIrma+ +sa.entTerc)-100)>0.01||Math.abs((+sa.parcEu+ +sa.parcIrma+ +sa.parcTerc)-100)>0.01)avisos+='<div class="note">As porcentagens de quem paga a entrada ou as parcelas não somam 100. O app ajusta proporcionalmente, mas vale revisar na aba Financiamento.</div>';
+  document.getElementById('p-aviso').innerHTML=avisos;
+
+  var bricks='';
+  for(var i=0;i<P;i++){var cl=i<paid?'on':(i===paid?'next':'');
+    bricks+='<span class="brick '+cl+'" title="Parcela '+(i+1)+' de '+P+', '+fMes(addM(c.primeiraParcela,i))+(i<paid?' (paga)':'')+'"></span>';}
+  var resto=P-paid,head,sub;
+  if(P===0){head='Sem parcelas';sub='';}
+  else if(resto===0){head='Financiamento quitado';sub='Todas as '+P+' parcelas foram pagas.';}
+  else{head=paid+' de '+P+' parcelas pagas';
+    sub='Faltam '+resto+' parcelas de '+money(c.valorParcela)+', '+money(resto*c.valorParcela)+' no total. A próxima vence em '+fData(addM(c.primeiraParcela,paid))+'.';}
+  document.getElementById('p-wall').innerHTML='<h2>'+head+'</h2><p class="muted">'+sub+'</p><div class="wall" role="img" aria-label="'+head+'">'+bricks+'</div><p class="small muted">Cada tijolo é uma parcela. O amarelo é a próxima.</p>';
+
+  /* quem colocou quanto */
+  var cols=['eu','irma','terc','tot'];
+  function compraK(k){var x=R.t[k];return x.entrada+x.parcelas;}
+  function obraK(k){var x=R.t[k];return x.gCompra+x.gReforma+x.gPos+x.fixas;}
+  function totK(k){return compraK(k)+obraK(k);}
+  function recK(k){return R.t[k].aluguel+R.t[k].ganhos;}
+  function cells(f){return cols.map(function(k){return '<td>'+f(k)+'</td>';}).join('');}
+  var shp=shares('part'),totAll=totK('tot');
+  var h='<h2>Quem colocou quanto, até hoje</h2><div class="scroll"><table class="socios"><thead><tr><th></th>'+cols.map(function(k){return '<th>'+esc(k==='tot'?'Todos juntos':nome(k))+'</th>';}).join('')+'</tr></thead><tbody>';
+  h+='<tr><td>Aportou na compra (entrada e parcelas)</td>'+cells(function(k){return money(compraK(k));})+'</tr>';
+  h+='<tr><td>Gastou na obra e despesas</td>'+cells(function(k){return money(obraK(k));})+'</tr>';
+  h+='<tr class="tot"><td>Total colocado</td>'+cells(function(k){return money(totK(k));})+'</tr>';
+  h+='<tr><td>Fatia do dinheiro colocado</td>'+cells(function(k){return k==='tot'?'100%':(totAll>0?pct(totK(k)/totAll*100,0):'0%');})+'</tr>';
+  h+='<tr><td>Participação na casa</td>'+cells(function(k){return k==='tot'?'100%':pct(shp[k]*100,0);})+'</tr>';
+  h+='<tr><td>Recebeu (aluguel e ganhos)</td>'+cells(function(k){return '<span class="pos">'+money(recK(k))+'</span>';})+'</tr>';
+  h+='<tr class="tot"><td>Dinheiro na casa, já descontado o que recebeu</td>'+cells(function(k){var d=totK(k)-recK(k);return '<span class="'+(d>0?'neg':'pos')+'">'+money(d)+'</span>';})+'</tr>';
+  h+='<tr><td>Economia por fazer ou ganhar de graça</td>'+cells(function(k){return '<span class="free">'+money(R.t[k].economia)+'</span>';})+'</tr>';
+  if(T>=0){
+    var Hn=Math.max(T,0),sers={};cols.forEach(function(k){sers[k]=series(Hn,k);});
+    h+='<tr class="grp"><th colspan="5">Valor hoje, se o mesmo dinheiro tivesse ido para...</th></tr>';
+    h+='<tr><td>A casa (parte de cada um mais aluguéis)</td>'+cells(function(k){return money0(sers[k].casa[Hn]);})+'</tr>';
+    h+='<tr><td>Renda fixa</td>'+cells(function(k){return money0(sers[k].rf[Hn]);})+'</tr>';
+    h+='<tr><td>Bolsa</td>'+cells(function(k){return money0(sers[k].bolsa[Hn]);})+'</tr>';
+  }
+  h+='</tbody></table></div>';
+  var pe=totK('eu'),pi=totK('irma'),own=shp.eu+shp.irma;
+  if(pe+pi>0&&own>0){
+    var fairEu=(pe+pi)*shp.eu/own,diff=pe-fairEu;
+    h+='<p class="small muted" style="margin-top:.7rem">Acerto entre '+esc(nome('eu'))+' e '+esc(nome('irma'))+', sem contar terceiros: '+(Math.abs(diff)<0.5?'vocês estão quites.':'para o dinheiro ficar dividido pela participação de cada um, a diferença é de <b>'+money(Math.abs(diff))+'</b> a favor de '+esc(nome(diff>0?'eu':'irma'))+'.')+'</p>';
+  }
+  h+='<p class="small muted">Para ver o gráfico e as taxas de cada pessoa, abra o Comparativo.</p>';
+  document.getElementById('p-socios').innerHTML=h;
+
+  var g='<h2>Contas até hoje, todos juntos</h2><table class="ledger"><tbody>';
+  g+='<tr class="grp"><th colspan="2">Saiu do bolso</th></tr>';
+  g+=row('Entrada',money(tt.entrada));
+  g+=row('Parcelas pagas ('+paid+')',money(tt.parcelas));
+  g+=row('Compra e documentação',money(tt.gCompra));
+  g+=row('Reforma',money(tt.gReforma));
+  if(tt.gPos>0)g+=row('Depois da obra',money(tt.gPos));
+  if(tt.fixas>0)g+=row('Despesas fixas',money(tt.fixas));
+  g+='<tr class="tot"><td>Total gasto</td><td class="neg">'+money(totGasto)+'</td></tr>';
+  g+='<tr class="grp"><th colspan="2">Entrou</th></tr>';
+  g+=row('Aluguel recebido',money(tt.aluguel));
+  g+=row('Outros ganhos',money(tt.ganhos));
+  g+='<tr class="tot"><td>Total recebido</td><td class="pos">'+money(totRec)+'</td></tr>';
+  g+='<tr class="grp"><th colspan="2">Resultado</th></tr>';
+  g+='<tr class="tot"><td>'+(saldo<0?'Dinheiro na casa, já descontado o que entrou':'A casa já devolveu mais do que custou')+'</td><td class="'+(saldo<0?'neg':'pos')+'">'+money(Math.abs(saldo))+'</td></tr>';
+  g+='</tbody></table>';
+  document.getElementById('p-contas').innerHTML=g;
+
+  var sob=tt.aluguel-tt.parcelas,cob=Math.min(Math.max(sob,0),tt.gReforma+tt.gCompra+tt.gPos);
+  var s='<div class="card"><h2>O aluguel e a obra</h2>';
+  if(a.valor>0){
+    s+='<p>O aluguel recebido até hoje foi de <b>'+money(tt.aluguel)+'</b> e as parcelas pagas somam <b>'+money(tt.parcelas)+'</b>.</p>';
+    if(sob>=0)s+='<p>Depois das parcelas sobraram <b class="pos">'+money(sob)+'</b>, que cobrem <b>'+money(cob)+'</b> dos gastos de obra e compra.</p>';
+    else s+='<p>O aluguel ainda não cobriu as parcelas: faltaram <b class="neg">'+money(-sob)+'</b>, que saíram do bolso dos sócios.</p>';
+    if(c.valorParcela>0)s+='<p class="muted small">Hoje o aluguel cobre '+pct(a.valor/c.valorParcela*100,0)+' de uma parcela.</p>';
+  } else s+='<p class="muted">Informe o aluguel para ver esta conta.</p>';
+  s+='</div>';
+
+  var gr=S.lanc.filter(function(l){return l.tipo==='gratis'&&idx(l.data)<=T;});
+  s+='<div class="card"><h2>Feito de graça</h2>';
+  if(gr.length){s+='<p>A economia é de <b class="free">'+money(tt.economia)+'</b> em '+gr.length+(gr.length>1?' itens':' item')+'.</p>';
+    s+=gr.slice().sort(function(x,y){return y.valor-x.valor;}).slice(0,4).map(function(l){return '<div class="catrow"><span>'+esc(l.descricao)+'</span><span>'+money(l.valor)+'</span></div>';}).join('');}
+  else s+='<p class="muted">Quando alguém fizer algo sozinho, como o contrato de compra, lance como "De graça" com o preço que pagaria.</p>';
+  s+='</div>';
+
+  var cats={},tot=0;
+  S.lanc.forEach(function(l){if(l.tipo==='gasto'&&idx(l.data)<=T){cats[l.categoria]=(cats[l.categoria]||0)+(+l.valor||0);tot+=+l.valor||0;}});
+  var ks=Object.keys(cats).sort(function(x,y){return cats[y]-cats[x];});
+  s+='<div class="card"><h2>Onde o dinheiro foi</h2>';
+  if(ks.length)s+=ks.map(function(k){return '<div class="catrow"><span>'+esc(k)+'</span><span>'+money(cats[k])+'</span></div><div class="bar"><i style="width:'+(cats[k]/tot*100)+'%"></i></div>';}).join('');
+  else s+='<p class="muted">Os gastos lançados aparecem aqui, por categoria.</p>';
+  s+='</div>';
+
+  var RE=calc(endIdx()),falta=sum(RE.out.tot)-sum(R.out.tot),entra=RE.t.tot.aluguel-tt.aluguel;
+  s+='<div class="card"><h2>Até o fim do financiamento</h2><table class="ledger"><tbody>'+
+    row('Ainda vai sair',money(Math.max(falta,0)),'neg')+row('Aluguel que ainda deve entrar',money(Math.max(entra,0)),'pos')+'</tbody></table></div>';
+  document.getElementById('p-side').innerHTML=s;
+
+  document.getElementById('h-sub').textContent=(P?'Parcela '+paid+' de '+P+'. ':'')+(saldo<0?'Dinheiro na casa: '+money0(-saldo):'Casa no azul: '+money0(saldo));
+}
+
+/* ---------- LANÇAMENTOS ---------- */
+var tipoAtual='gasto',editId=null;
+function fillSelects(){
+  document.getElementById('l-cat').innerHTML=CATS.map(function(c){return '<option>'+esc(c)+'</option>';}).join('');
+  var fo=Object.keys(FASES).map(function(k){return '<option value="'+k+'">'+FASES[k]+'</option>';}).join('');
+  document.getElementById('l-fase').innerHTML=fo;
+  document.getElementById('f-fase').innerHTML='<option value="">Todas as fases</option>'+fo;
+  document.getElementById('l-data').value=todayStr;
+  updateNomes();
+  setTipo('gasto');
+}
+function setTipo(t){
+  tipoAtual=t;
+  document.querySelectorAll('#l-tipo button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.tipo===t);});
+  document.getElementById('l-dica').textContent=DICAS[t];
+  document.getElementById('l-valor-lbl').textContent=t==='gratis'?'Quanto custaria no mercado (R$)':'Valor (R$)';
+  document.getElementById('l-quem-lbl').textContent=QUEM_LBL[t];
+  if(!editId)document.getElementById('l-quem').value=(t==='ganho'?'todos':'eu');
+}
+function limpaForm(){
+  editId=null;document.getElementById('l-desc').value='';document.getElementById('l-valor').value='';document.getElementById('l-obs').value='';
+  document.getElementById('l-data').value=todayStr;document.getElementById('l-titulo').textContent='Novo lançamento';
+  document.getElementById('l-salvar').textContent='Salvar lançamento';document.getElementById('l-cancelar').hidden=true;
+  document.getElementById('l-erro').hidden=true;
+}
+function salvaLanc(){
+  var data=document.getElementById('l-data').value,desc=document.getElementById('l-desc').value.trim(),
+      val=parseFloat(document.getElementById('l-valor').value),erro=document.getElementById('l-erro');
+  var cat=document.getElementById('l-cat').value;
+  if(!data){erro.textContent='Escolha a data.';erro.hidden=false;return;}
+  if(!(val>0)){erro.textContent='Informe um valor maior que zero.';erro.hidden=false;return;}
+  var o={id:editId||('l'+Date.now()+Math.random().toString(36).slice(2,6)),tipo:tipoAtual,data:data,descricao:desc||cat,valor:val,
+    categoria:cat,fase:document.getElementById('l-fase').value,quem:document.getElementById('l-quem').value,obs:document.getElementById('l-obs').value.trim()};
+  if(editId){S.lanc=S.lanc.map(function(l){return l.id===editId?o:l;});}else S.lanc.push(o);
+  limpaForm();setTipo(tipoAtual);refresh();toast('Lançamento salvo.');
+}
+function editaLanc(id){
+  var l=S.lanc.filter(function(x){return x.id===id;})[0];if(!l)return;
+  editId=id;setTipo(l.tipo);
+  document.getElementById('l-data').value=l.data;document.getElementById('l-desc').value=l.descricao;document.getElementById('l-valor').value=l.valor;
+  document.getElementById('l-cat').value=l.categoria;document.getElementById('l-fase').value=l.fase;document.getElementById('l-quem').value=l.quem||'todos';document.getElementById('l-obs').value=l.obs||'';
+  document.getElementById('l-titulo').textContent='Editando lançamento';document.getElementById('l-salvar').textContent='Atualizar lançamento';
+  document.getElementById('l-cancelar').hidden=false;window.scrollTo(0,0);
+}
+function apagaLanc(id){
+  var i=S.lanc.findIndex(function(x){return x.id===id;});if(i<0)return;
+  var rem=S.lanc.splice(i,1)[0];refresh();
+  toast('Lançamento apagado.','Desfazer',function(){S.lanc.splice(i,0,rem);refresh();});
+}
+function renderLista(){
+  var q=document.getElementById('f-busca').value.toLowerCase(),ft=document.getElementById('f-tipo').value,ff=document.getElementById('f-fase').value,fq=document.getElementById('f-quem').value;
+  var T=todayIdx();
+  var ls=S.lanc.filter(function(l){return (!ft||l.tipo===ft)&&(!ff||l.fase===ff)&&(!fq||(l.quem||'todos')===fq)&&(!q||(l.descricao+' '+(l.obs||'')+' '+l.categoria).toLowerCase().indexOf(q)>=0);})
+    .sort(function(a,b){return a.data<b.data?1:a.data>b.data?-1:0;});
+  var box=document.getElementById('l-lista');
+  if(!ls.length){box.innerHTML='<p class="muted">'+(S.lanc.length?'Nenhum lançamento com esses filtros.':'Nenhum lançamento ainda. Comece anotando o primeiro gasto, como o cartório ou o ITBI, e escolha quem pagou.')+'</p>';}
+  else box.innerHTML=ls.map(function(l){
+    var cls=l.tipo==='gasto'?'neg':l.tipo==='ganho'?'pos':'free';
+    var val=(l.tipo==='gasto'?'− ':l.tipo==='ganho'?'+ ':'')+money(l.valor);
+    return '<div class="item"><span class="d">'+fData(l.data)+'</span>'+
+      '<span><span class="t">'+esc(l.descricao)+'</span><span class="tag">'+esc(nome(l.quem||'todos'))+'</span>'+(idx(l.data)>T?'<span class="tag prev">previsto</span>':'')+
+      '<br><span class="small muted">'+TIPOS[l.tipo]+', '+esc(l.categoria)+', '+FASES[l.fase]+(l.obs?'. '+esc(l.obs):'')+'</span></span>'+
+      '<span class="v '+cls+'">'+val+(l.tipo==='gratis'?'<br><span class="small muted" style="font-weight:400">economia</span>':'')+'</span>'+
+      '<span class="acts"><button class="btn ghost sm" type="button" data-edit="'+l.id+'">Editar</button> <button class="btn danger sm" type="button" data-del="'+l.id+'">Apagar</button></span></div>';
+  }).join('');
+  var g=0,r=0,e=0;ls.forEach(function(l){if(l.tipo==='gasto')g+=+l.valor;else if(l.tipo==='ganho')r+=+l.valor;else e+=+l.valor;});
+  document.getElementById('l-totais').innerHTML='Nesta lista: gastos <b class="neg">'+money(g)+'</b>, ganhos <b class="pos">'+money(r)+'</b>, economia <b class="free">'+money(e)+'</b>.';
+}
+
+/* ---------- FINANCIAMENTO ---------- */
+function renderFin(){
+  var c=S.compra,a=S.aluguel,sa=S.socios,fin=c.preco-c.entrada,totParc=c.parcelas*c.valorParcela,totalPago=c.entrada+totParc;
+  var r=taxaImplicita(fin,c.valorParcela,c.parcelas),aa=(Math.pow(1+r,12)-1)*100;
+  var h='<table class="ledger"><tbody>'+row('Valor financiado',money(fin))+row('Soma das parcelas',money(totParc))+row('Total pago pela casa',money(totalPago))+
+    row('Diferença para o preço',money(totalPago-c.preco),totalPago-c.preco>0.005?'neg':'')+
+    row('Juros embutidos',r<1e-6?'Sem juros':pct(r*100,2)+' ao mês ('+pct(aa,1)+' ao ano)')+'</tbody></table>';
+  if(r<1e-6)h+='<p class="muted small" style="margin-top:.6rem">Parcelas sem juros significam que o dinheiro que você não paga hoje rende enquanto espera. É isso que o Comparativo mede.</p>';
+  document.getElementById('fin-out').innerHTML=h;
+  var ah='';
+  if(a.valor>0&&c.valorParcela>0)ah='<p style="margin-top:.8rem">O aluguel de <b>'+money(a.valor)+'</b> cobre <b>'+pct(a.valor/c.valorParcela*100,0)+'</b> da parcela'+(a.valor>=c.valorParcela?', e ainda sobram '+money(a.valor-c.valorParcela)+' por mês.':', e faltam '+money(c.valorParcela-a.valor)+' por mês dos sócios.')+'</p>';
+  document.getElementById('alug-out').innerHTML=ah;
+  var sE=+sa.entEu+ +sa.entIrma+ +sa.entTerc,sP=+sa.parcEu+ +sa.parcIrma+ +sa.parcTerc,sPt=+sa.partEu+ +sa.partIrma+ +sa.partTerc;
+  function chk(n,v){return '<span class="'+(Math.abs(v-100)<0.01?'pos':'neg')+'">'+n+': '+pct(v,1)+'</span>';}
+  var shE=shares('ent'),shP=shares('parc');
+  var so='Somas: '+chk('participação',sPt)+', '+chk('entrada',sE)+', '+chk('parcelas',sP)+'.';
+  so+='<br><span class="muted">Por parcela: '+WHO.map(function(k){return esc(nome(k))+' paga '+money(c.valorParcela*shP[k]);}).join(', ')+'. Na entrada: '+WHO.map(function(k){return esc(nome(k))+' paga '+money(c.entrada*shE[k]);}).join(', ')+'.</span>';
+  document.getElementById('soc-out').innerHTML=so;
+  var T=todayIdx(),i0=idx(c.primeiraParcela),rows='';
+  for(var k=0;k<c.parcelas;k++){var st=(i0+k)<=T;rows+='<tr><td>'+(k+1)+'</td><td>'+fData(addM(c.primeiraParcela,k))+'</td><td>'+money(c.valorParcela)+'</td><td class="'+(st?'pos':'muted')+'">'+(st?'Paga':'A pagar')+'</td></tr>';}
+  document.getElementById('parc-tab').innerHTML='<table class="sens"><thead><tr><th>Parcela</th><th>Vencimento</th><th>Valor</th><th>Situação</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+/* ---------- COMPARATIVO ---------- */
+function niceStep(x){var p=Math.pow(10,Math.floor(Math.log10(x))),f=x/p;return (f<=1?1:f<=2?2:f<=5?5:10)*p;}
+function legend(lines){return '<div class="legend">'+lines.map(function(L){return '<span><i style="border-color:'+L.c+(L.dash?';border-top-style:dashed':'')+'"></i>'+L.n+'</span>';}).join('')+'</div>';}
+function chartSVG(lines,H,label){
+  var W=720,Ht=320,ml=62,mr=118,mt=14,mb=32;
+  var all=[];lines.forEach(function(L){all=all.concat(L.a);});
+  var ymax=Math.max.apply(null,all)*1.05||1,step=niceStep(ymax/4);ymax=Math.ceil(ymax/step)*step;
+  var Hs=Math.max(H,1);
+  function X(m){return ml+m/Hs*(W-ml-mr);}
+  function Y(v){return mt+(1-v/ymax)*(Ht-mt-mb);}
+  function path(a){return a.map(function(v,m){return (m?'L':'M')+X(m).toFixed(1)+' '+Y(v).toFixed(1);}).join('');}
+  var g='',v,m;
+  for(v=0;v<=ymax+1e-9;v+=step){g+='<line x1="'+ml+'" x2="'+(W-mr)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(ml-8)+'" y="'+(Y(v)+4)+'" text-anchor="end" font-size="11" fill="var(--muted)">'+short(v)+'</text>';}
+  var every=Math.max(12,Math.ceil(H/5/12)*12);
+  for(m=0;m<=H;m+=every){g+='<text x="'+X(m)+'" y="'+(Ht-10)+'" text-anchor="middle" font-size="11" fill="var(--muted)">'+fMes(addM(S.compra.dataCompra,m))+'</text>';}
+  var T=todayIdx();
+  if(T>0&&T<=H)g+='<line x1="'+X(T)+'" x2="'+X(T)+'" y1="'+mt+'" y2="'+(Ht-mb)+'" stroke="var(--muted)" stroke-dasharray="3 4"/><text x="'+(X(T)+4)+'" y="'+(mt+10)+'" font-size="11" fill="var(--muted)">hoje</text>';
+  lines.forEach(function(L){g+='<path d="'+path(L.a)+'" fill="none" stroke="'+L.c+'" stroke-width="'+(L.w||2.4)+'" '+(L.dash?'stroke-dasharray="4 4"':'')+' stroke-linejoin="round"/>';});
+  var ends=lines.map(function(L){var val=L.a[H];return{n:L.n,y:Y(val),v:val};}).sort(function(a,b){return a.y-b.y;});
+  for(var i=1;i<ends.length;i++)if(ends[i].y-ends[i-1].y<14)ends[i].y=ends[i-1].y+14;
+  ends.forEach(function(e){g+='<text x="'+(W-mr+6)+'" y="'+(e.y+4)+'" font-size="11.5" font-weight="600" fill="var(--ink)">'+e.n+' '+short(e.v)+'</text>';});
+  return '<svg viewBox="0 0 '+W+' '+Ht+'" role="img" aria-label="'+label+'">'+g+'</svg>';
+}
+function renderComp(){
+  var H=getH(),sl=document.getElementById('h-slider');sl.max=endIdx()+240;sl.value=H;
+  var P=S.prem,who=P.quem||'tot',ser=series(H,who),R=ser.R;
+  var quemNome=who==='tot'?'todos juntos':nome(who);
+  var fin={casa:ser.casa[H],rf:ser.rf[H],bolsa:ser.bolsa[H]},contrib=ser.contrib[H];
+  document.getElementById('h-label').textContent='Ver o resultado em '+fMes(addM(S.compra.dataCompra,H))+' (mês '+H+' desde a compra)';
+  var best=Object.keys(fin).sort(function(a,b){return fin[b]-fin[a];})[0];
+  var rentTot=sum(ser.rent);
+  function res(k,nm,det){var lucro=fin[k]-contrib,p=contrib>0?lucro/contrib*100:0;
+    return '<div class="res'+(k===best?' win':'')+'"><h3>'+nm+(k===best?' <span class="tag prev">maior patrimônio</span>':'')+'</h3><div class="big">'+money0(fin[k])+'</div>'+
+      '<div class="small muted">Lucro de <span class="'+(lucro>=0?'pos':'neg')+'">'+money0(lucro)+'</span> ('+pct(p,0)+' sobre o que foi colocado). '+det+'</div></div>';}
+  var h='<h2>Resultado para '+esc(quemNome)+'</h2><p>Dinheiro colocado até esse mês: <b>'+money0(contrib)+'</b>. Aluguel recebido: <b>'+money0(rentTot)+'</b>.</p>';
+  if(who!=='tot'&&shares('part')[who]===0)h+='<p class="muted small">Esta pessoa tem 0% de participação, então não fica com parte da casa nem do aluguel. Veja a coluna da casa como o que ela recebe de volta.</p>';
+  h+=res('casa','Ficar com a casa','Casa '+money0(ser.imovel[H])+' mais aluguéis reaplicados '+money0(ser.alug[H])+'.');
+  h+=res('rf','Renda fixa a '+pct(P.rf)+' ao ano','Sem aluguel, só os juros mensais.');
+  h+=res('bolsa','Bolsa com DY de '+pct(P.dy)+' ao ano'+(P.cotas?' e cotas '+(P.cotas>0?'subindo ':'caindo ')+pct(Math.abs(P.cotas))+' ao ano':''),'Sem aluguel, só os dividendos'+(P.cotas?' e a variação das cotas':'')+'.');
+  var be=breakEven(R.out[who],P.irBolsa,fin.casa),be2=breakEven(R.out[who],P.irRf,fin.casa);
+  function beTxt(n,b){return b.rate!=null?n+' precisaria render <b>'+pct(b.rate)+' ao ano</b> (com rendimento reinvestido todo mês) para empatar com a casa.':(b.dir==='acima'?n+' não alcança a casa nem com taxas altíssimas.':n+' empata com a casa mesmo rendendo bem menos que zero.');}
+  h+='<p style="margin-top:.4rem">'+beTxt('A bolsa',be)+' '+beTxt('A renda fixa',be2)+'</p>';
+  document.getElementById('c-res').innerHTML=h;
+
+  var wl=[{n:'Colocado',c:'var(--muted)',dash:true,a:ser.contrib},{n:'Renda fixa',c:'var(--ganho)',a:ser.rf},{n:'Bolsa',c:'var(--tape)',a:ser.bolsa},{n:'Casa',c:'var(--brand)',w:3.2,a:ser.casa}];
+  document.getElementById('c-chart').innerHTML='<h2>Patrimônio mês a mês</h2>'+legend(wl)+'<div class="chartbox">'+chartSVG(wl,H,'Evolução do patrimônio na casa, renda fixa e bolsa ao longo do tempo')+'</div>';
+
+  var il=[{n:'Aluguel',c:'var(--brand)',w:3,a:ser.rent},{n:'Dividendos da bolsa',c:'var(--tape)',a:ser.divB},{n:'Juros da renda fixa',c:'var(--ganho)',a:ser.divRf}];
+  var rh='<h2>Renda por mês: aluguel contra dividendos</h2><p class="muted small">O aluguel muda só no reajuste anual. Os dividendos e juros crescem a cada mês quando são reinvestidos, porque o dinheiro que entrou também passa a render.</p>';
+  rh+='<p>Em '+fMes(addM(S.compra.dataCompra,H))+': aluguel de <b>'+money(ser.rent[H])+'</b>, dividendos da bolsa de <b>'+money(ser.divB[H])+'</b> e juros da renda fixa de <b>'+money(ser.divRf[H])+'</b> por mês.</p>';
+  rh+=legend(il)+'<div class="chartbox">'+chartSVG(il,H,'Renda mensal do aluguel, dos dividendos da bolsa e dos juros da renda fixa')+'</div>';
+  document.getElementById('c-renda').innerHTML=rh;
+
+  var rates=[0,4,8,12,16,20],srows=rates.map(function(r){var f=invFinal(R.out[who],r,P.irBolsa),d=f-fin.casa;
+    return '<tr><td>'+r+'% ao ano</td><td>'+money0(f)+'</td><td class="'+(d>=0?'pos':'neg')+'">'+(d>=0?'+':'−')+money0(Math.abs(d))+'</td></tr>';}).join('');
+  document.getElementById('c-sens').innerHTML='<h2>E se o investimento render...</h2><p class="muted small">Retorno total da bolsa por ano, com rendimento reinvestido todo mês, neste mesmo mês, e a diferença para a casa ('+money0(fin.casa)+').</p><table class="sens"><thead><tr><th>Taxa</th><th>Bolsa</th><th>Diferença para a casa</th></tr></thead><tbody>'+srows+'</tbody></table>';
+
+  var tr='';
+  for(var m=0;m<=Math.min(12,H);m++){
+    tr+='<tr><td>'+m+'</td><td>'+fMes(addM(S.compra.dataCompra,m))+'</td><td>'+money(ser.contrib[m])+'</td><td>'+money(ser.bBal[m])+'</td><td>'+money(ser.divB[m])+'</td><td>'+money(ser.rent[m])+'</td></tr>';
+  }
+  document.getElementById('c-tab').innerHTML='<table class="sens"><thead><tr><th>Mês</th><th>Data</th><th>Colocado até aqui</th><th>Carteira na bolsa</th><th>Dividendo do mês</th><th>Aluguel do mês</th></tr></thead><tbody>'+tr+'</tbody></table>';
+}
+
+/* ---------- geral ---------- */
+function refresh(){
+  save();updateNomes();
+  document.getElementById('h-nome').textContent=S.nome||'Minha casa';
+  document.title=(S.nome||'Minha casa')+' em obra';
+  renderPainel();renderLista();renderFin();renderComp();
+}
+function setPath(p,v){var k=p.split('.');if(k.length===1)S[k[0]]=v;else S[k[0]][k[1]]=v;}
+function getPath(p){var k=p.split('.');return k.length===1?S[k[0]]:S[k[0]][k[1]];}
+function syncInputs(){document.querySelectorAll('[data-path]').forEach(function(el){var p=el.dataset.path,v=getPath(p);if(p==='prem.horizonte')v=getH();el.value=(v==null?'':v);});}
+
+document.addEventListener('input',function(e){
+  var el=e.target.closest('[data-path]');
+  if(el){
+    var p=el.dataset.path,v=el.value,ty=el.dataset.type;
+    if(ty==='num'){v=parseFloat(v);if(!isFinite(v))v=0;}
+    else if(ty==='int'){v=parseInt(v,10);if(!isFinite(v)||v<0)v=0;}
+    else if(ty==='date'&&!v)return;
+    setPath(p,v);
+    document.querySelectorAll('[data-path="'+p+'"]').forEach(function(o){if(o!==el)o.value=v;});
+    refresh();return;
+  }
+  if(e.target.id==='f-busca')renderLista();
+});
+document.addEventListener('change',function(e){if(e.target.id==='f-tipo'||e.target.id==='f-fase'||e.target.id==='f-quem')renderLista();});
+document.addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  if(b.dataset.tab)return showTab(b.dataset.tab);
+  if(b.dataset.tipo)return setTipo(b.dataset.tipo);
+  if(b.dataset.edit)return editaLanc(b.dataset.edit);
+  if(b.dataset.del)return apagaLanc(b.dataset.del);
+  if(b.dataset.b){S.prem.dy=parseFloat(b.dataset.b);syncInputs();return refresh();}
+  if(b.dataset.act==='h-hoje'){S.prem.horizonte=Math.max(todayIdx(),0);syncInputs();return refresh();}
+  if(b.dataset.act==='h-fim'){S.prem.horizonte=null;syncInputs();return refresh();}
+  if(b.dataset.act==='h-mais5'){S.prem.horizonte=endIdx()+60;syncInputs();return refresh();}
+});
+document.getElementById('l-salvar').addEventListener('click',salvaLanc);
+document.getElementById('l-cancelar').addEventListener('click',function(){limpaForm();setTipo(tipoAtual);});
+document.getElementById('bk-copiar').addEventListener('click',function(){
+  var ta=document.getElementById('bk-text');ta.focus();ta.select();
+  var ok=false;try{ok=document.execCommand('copy');}catch(e){}
+  if(!ok&&navigator.clipboard){navigator.clipboard.writeText(ta.value).then(function(){toast('Texto copiado.');},function(){toast('Selecione o texto e copie manualmente.');});}
+  else toast(ok?'Texto copiado.':'Selecione o texto e copie manualmente.');
+});
+document.getElementById('bk-restaurar').addEventListener('click',function(){
+  var er=document.getElementById('bk-erro');
+  try{var o=JSON.parse(document.getElementById('bk-in').value);
+    if(!o||typeof o!=='object'||!o.compra||!Array.isArray(o.lanc))throw new Error('x');
+    S=merge(o);er.hidden=true;document.getElementById('bk-in').value='';nomesKey='';updateNomes();syncInputs();refresh();
+    document.getElementById('bk-text').value=JSON.stringify(S,null,1);toast('Dados restaurados.');
+  }catch(err){er.textContent='Esse texto não parece um backup válido. Cole o texto completo, do primeiro ao último caractere.';er.hidden=false;}
+});
+var apagarT,apagarArmado=false;
+document.getElementById('bk-apagar').addEventListener('click',function(){
+  var b=this;
+  if(!apagarArmado){apagarArmado=true;b.textContent='Clique de novo para apagar tudo';apagarT=setTimeout(function(){apagarArmado=false;b.textContent='Apagar tudo';},4000);return;}
+  clearTimeout(apagarT);apagarArmado=false;b.textContent='Apagar tudo';
+  S=DEF();limpaForm();nomesKey='';updateNomes();syncInputs();refresh();document.getElementById('bk-text').value=JSON.stringify(S,null,1);toast('Todos os dados foram apagados.');
+});
+
+buildTabs();fillSelects();syncInputs();refresh();
+})();
+</script>
+</body>
+</html>
